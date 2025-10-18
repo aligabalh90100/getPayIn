@@ -1,73 +1,44 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStaticNavigation, StaticParamList } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform } from 'react-native';
+import {
+  createNavigationContainerRef,
+  NavigationContainer,
+} from "@react-navigation/native";
+import AuthNavigator from "./authNavigator";
+import { StatusBar } from "react-native";
+import { useAppSelector } from "@/services/redux";
+import AppStackNavigator from "./appStackNavigator";
+import useNetworkStatus from "@/hooks/useNetworkStatus";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import SplashScreen from "./screens/SplashScreen";
+import { AutoLogoutProvider } from "@/context/AutoLogoutProvider";
 
-import { Explore } from './screens/Explore';
-import { Home } from './screens/Home';
-import { NotFound } from './screens/NotFound';
+const navigationRef = createNavigationContainerRef();
+const Stack = createNativeStackNavigator();
+const RootNavigator = () => {
+  useNetworkStatus();
+  const { theme } = useAppSelector((state) => state.settings);
+  StatusBar.setBarStyle(theme === "light" ? "dark-content" : "light-content");
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
+  return (
+    <NavigationContainer ref={navigationRef}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Auth" component={AuthNavigator} />
+        <Stack.Screen name="App" component={AppStackNavigator} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
-const HomeTabs = createBottomTabNavigator({
-  screens: {
-    Home: {
-      screen: Home,
-      options: {
-        headerShown: false,
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-      },
-    },
-    Explore: {
-      screen: Explore,
-      options: {
-        headerShown: false,
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-      },
-    },
-  },
-  screenOptions: {
-    headerShown: false,
-    tabBarButton: HapticTab,
-    tabBarBackground: TabBarBackground,
-    tabBarStyle: Platform.select({
-      ios: {
-        // Use a transparent background on iOS to show the blur effect
-        possition: 'absolute',
-      },
-      default: {},
-    }),
-  },
-});
+export default RootNavigator;
 
-const RootStack = createNativeStackNavigator({
-  screens: {
-    HomeTabs: {
-      screen: HomeTabs,
-      options: {
-        headerShown: false,
-      },
-    },
-    NotFound: {
-      screen: NotFound,
-      options: {
-        title: '404',
-      },
-      linking: {
-        path: '*',
-      },
-    },
-  },
-});
+// type RootStackParamList = StaticParamList<typeof Stack>;
 
-export const Navigation = createStaticNavigation(RootStack);
-
-type RootStackParamList = StaticParamList<typeof RootStack>;
-
-declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
-  }
-}
+// declare global {
+//   namespace ReactNavigation {
+//     interface RootParamList extends RootStackParamList {}
+//   }
+// }
