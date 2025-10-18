@@ -28,7 +28,6 @@ const LoginScreen = () => {
     formState: { isValid },
   } = useForm<ILoginData>({
     mode: "all",
-    defaultValues: { username: "emilys", password: "emilyspass" },
   });
   const { mutate, isPending } = useMutation({
     mutationFn: handleLogin,
