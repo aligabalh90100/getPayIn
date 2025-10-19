@@ -29,6 +29,7 @@
     "expo-haptics": "~15.0.2",
     "expo-image": "~3.0.2",
     "expo-linking": "~8.0.2",
+    "expo-local-authentication": "~17.0.7",
     "expo-secure-store": "^15.0.7",
     "expo-splash-screen": "~31.0.3",
     "expo-status-bar": "~3.0.3",

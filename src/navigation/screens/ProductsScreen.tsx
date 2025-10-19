@@ -34,15 +34,15 @@ const ProductsScreen = () => {
   const { isLoading, data } = useQuery({
     queryKey: ["categories"],
     queryFn: getAllProductsCategories,
-    enabled: networkConnected || !cached,
+    enabled: networkConnected,
   });
 
   useEffect(() => {
-    if (!categoryList.length && networkConnected && data) {
+    if (networkConnected && data) {
       setCategoryList(data);
       mmkvSetValue("categories", JSON.stringify(data));
     }
-  }, [data, networkConnected, categoryList]);
+  }, [data, networkConnected]);
   return (
     <View style={{ gap: 15, flex: 1 }}>
       <ScreenHeader withBack={false} style={styles.header}>
@@ -72,7 +72,10 @@ const ProductsScreen = () => {
         </TouchableOpacity>
       </ScreenHeader>
       {!networkConnected && <InternetError />}
-      <Loading loading={isLoading && networkConnected} style={{ height: 60 }}>
+      <Loading
+        loading={isLoading && networkConnected && !cached}
+        style={{ height: 60 }}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

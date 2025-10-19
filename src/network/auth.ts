@@ -30,3 +30,13 @@ export async function handleLogin({
 
   return response.json();
 }
+
+export async function getAuthUser(token: string) {
+  const response = await fetch("https://dummyjson.com/auth/me", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.json();
+}

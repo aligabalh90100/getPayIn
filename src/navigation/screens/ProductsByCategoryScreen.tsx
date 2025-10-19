@@ -15,7 +15,7 @@ import { mmkvGetValue, mmkvSetValue } from "@/services/mmkvStorage";
 type Props = NativeStackScreenProps<RootStackParamList, "ProductsByCategory">;
 const ProductsByCategoryScreen = ({ route }: Props) => {
   const { category, name } = route.params;
-  const cached = mmkvGetValue("productsByCategory");
+  const cached = mmkvGetValue("productsByCategory" + name);
   const { networkConnected } = useAppSelector((state) => state.settings);
   const [productsList, setProductsList] = useState<IProduct[]>(() =>
     cached ? JSON.parse(cached) : []
@@ -27,15 +27,15 @@ const ProductsByCategoryScreen = ({ route }: Props) => {
     enabled: networkConnected,
   });
   useEffect(() => {
-    if (!productsList.length && networkConnected && data) {
+    if (networkConnected && data) {
       setProductsList(data);
-      mmkvSetValue("productsByCategory", JSON.stringify(data));
+      mmkvSetValue("productsByCategory" + name, JSON.stringify(data));
     }
-  }, [data, networkConnected, productsList]);
+  }, [data, networkConnected, name]);
   return (
     <ScreenContainer>
       <ScreenHeader title={name} withBack />
-      <Loading loading={isLoading && networkConnected}>
+      <Loading loading={isLoading && networkConnected && !cached}>
         <FlatList
           contentContainerStyle={{ paddingBottom: 20 }}
           data={productsList}

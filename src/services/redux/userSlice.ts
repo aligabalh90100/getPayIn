@@ -1,7 +1,7 @@
 import { ILoginResponse } from "@/network/auth";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface IUser extends ILoginResponse {
+interface IUser extends Omit<ILoginResponse, "accessToken" | "refreshToken"> {
   isAdmin?: boolean;
 }
 export interface IUserSlice {

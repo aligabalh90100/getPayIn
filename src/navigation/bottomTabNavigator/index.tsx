@@ -8,6 +8,7 @@ import ProductsScreen from "../screens/ProductsScreen";
 import MyTabBar from "@/components/MyTabBar";
 import { useAppDispatch } from "@/services/redux";
 import { clearUser } from "@/services/redux/userSlice";
+import useAppNavigation from "../routes";
 
 type AppTabParamList = {
   Products: undefined;
@@ -18,12 +19,19 @@ const Tab = createBottomTabNavigator<AppTabParamList>();
 
 const BottomTabNavigator = () => {
   const dispatch = useAppDispatch();
+  const { reset } = useAppNavigation();
   const themeColors = useThemeColor();
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", onPress: () => dispatch(clearUser()) },
+      {
+        text: "Logout",
+        onPress: () => {
+          reset({ index: 0, routes: [{ name: "Auth" }] });
+          dispatch(clearUser());
+        },
+      },
     ]);
   };
 

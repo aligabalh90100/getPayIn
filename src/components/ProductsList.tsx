@@ -53,14 +53,17 @@ const HomeProducts = () => {
     );
   };
   useEffect(() => {
-    if ((!productsList.length || hasNextPage) && networkConnected) {
-      const products = data?.pages.flatMap((page) => page.products) ?? [];
-      setProductsList(products);
-      mmkvSetValue("allProductsList", JSON.stringify(products));
+    if (networkConnected && data) {
+      const newProducts = data.pages.flatMap((page) => page.products) ?? [];
+      if (newProducts.length > productsList.length) {
+        setProductsList(newProducts);
+        mmkvSetValue("allProductsList", JSON.stringify(newProducts));
+      }
     }
-  }, [productsList, data, networkConnected, hasNextPage]);
+  }, [data, networkConnected]);
+
   return (
-    <Loading loading={isLoading && networkConnected}>
+    <Loading loading={isLoading && networkConnected && !cached}>
       <FlatList
         onScroll={resetTimer}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}

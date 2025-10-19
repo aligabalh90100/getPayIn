@@ -1,19 +1,43 @@
 import { View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import CustomText from "@/components/CustomText";
-import { useAppSelector } from "@/services/redux";
+import { useAppDispatch } from "@/services/redux";
 import useAppNavigation from "../routes";
+import SecureStorage from "@/services/secureStorage";
+import { getAuthUser } from "@/network/auth";
+import { setUser } from "@/services/redux/userSlice";
+import useBiometrics from "@/hooks/useBiometrics";
 
 const SplashScreen = () => {
   const themeColors = useThemeColor();
-  const { user } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const { authenticateBiometrics } = useBiometrics();
   const { replace } = useAppNavigation();
+  const validateUser = useCallback(async () => {
+    const token = SecureStorage.get("getPayInToken");
+    if (!token) {
+      return replace("Auth");
+    }
+    try {
+      const response = await getAuthUser(token);
+      if (response) {
+        const result = await authenticateBiometrics();
+        if (result?.success) {
+          dispatch(setUser(response));
+          replace("App");
+        } else {
+          return replace("Auth");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return replace("Auth");
+    }
+  }, []);
   useEffect(() => {
-    setTimeout(() => {
-      replace(user ? "App" : "Auth");
-    }, 500);
-  }, [user, replace]);
+    validateUser();
+  }, [validateUser]);
   return (
     <View
       style={{
